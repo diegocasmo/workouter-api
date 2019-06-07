@@ -1,6 +1,6 @@
 const resolvers = {
   Query: {
-    me: () => ({
+    currentUser: () => ({
       _id: '123',
       name: 'Diego Castillo',
       email: 'email@.foo.bar',

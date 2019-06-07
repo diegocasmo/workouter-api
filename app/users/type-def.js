@@ -11,7 +11,7 @@ const typeDef = gql`
   }
 
   extend type Query {
-    me: User
+    currentUser: User
   }
 `
 

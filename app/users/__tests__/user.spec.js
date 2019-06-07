@@ -1,28 +1,35 @@
+require('../../../test-utils/setup')
+const { Factory } = require('rosie')
 const { expect } = require('chai')
 const { User } = require('../')
 
 describe('User Model', () => {
 
+  it('can create a valid user', async () => {
+    const user = User(Factory.build('user'))
+    const res = await user.save()
+    const record = await User.findOne(res._id)
+    expect(res.toJSON()).to.be.eql(record.toJSON())
+  })
+
   describe('validation', () => {
 
-    it('requires a name', async () => {
-      try {
-        let u = User({name: ''})
-        await u.validate()
-        throw new Error("User 'name' must be required") // force catch to be executed
-      } catch ({ errors }) {
-        expect(errors).to.have.property('name')
-      }
+    it('requires a name', () => {
+      let user = User({ name: '' })
+      const { errors } = user.validateSync()
+      expect(errors.name.message).to.be.equal('User name is required')
     })
 
-    it('requires an email', async () => {
-      try {
-        let u = User({name: 'Foo bar', email: ''})
-        await u.validate()
-        throw new Error("User 'email' must be required") // force catch to be executed
-      } catch ({ errors }) {
-        expect(errors).to.have.property('email')
-      }
+    it('requires an email', () => {
+      let user = User({ email: '' })
+      const { errors } = user.validateSync()
+      expect(errors.email.message).to.be.equal('User email is required')
+    })
+
+    it('requires a valid email', () => {
+      let user = User({ email: 'invalid email' })
+      const { errors } = user.validateSync()
+      expect(errors.email.message).to.be.equal('User email in invalid')
     })
   })
 })
