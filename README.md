@@ -12,3 +12,12 @@ API for [Workouter UI](https://github.com/diegocasmo/workouter-ui).
 
 ## Running Unit Tests
   - `yarn test`
+
+### Heroku deployment
+  - Run the following commands to deploy the app to Heroku:
+    - These commands assume you have added the Heroku app remote (i.e., `heroku git:remote -a workouterapi`)
+``` bash
+heroku maintenance:on -a workouterapi
+git push heroku master
+heroku maintenance:off -a workouterapi
+```
