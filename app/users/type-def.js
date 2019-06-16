@@ -5,7 +5,7 @@ const typeDef = gql`
     _id: ID
     name: String
     email: String
-    picture: String
+    pictureUrl: String
     createdAt: String
     updatedAt: String
   }

@@ -1,13 +1,8 @@
+const { authenticated } = require('../middleware/auth')
+
 const resolvers = {
   Query: {
-    currentUser: () => ({
-      _id: '123',
-      name: 'Diego Castillo',
-      email: 'email@.foo.bar',
-      picture: 'foo bar',
-      createdAt: Date.now,
-      updatedAt: Date.now
-    })
+    currentUser: authenticated((root, args, ctx) => ctx.currentUser)
   }
 }
 
