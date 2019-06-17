@@ -2,12 +2,12 @@
   "name": "workouter_api",
   "version": "1.0.0",
   "description": "API for the Workouter application",
-  "main": "server.js",
+  "main": "index.js",
   "author": "Diego Castillo",
   "license": "MIT",
   "scripts": {
-    "start": "NODE_ENV=production node server.js",
-    "dev": "NODE_ENV=dev nodemon server.js",
+    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=dev nodemon index.js",
     "test": "NODE_ENV=test mocha **/*.spec.js"
   },
   "dependencies": {
@@ -19,12 +19,12 @@
     "mongoose-unique-validator": "^2.0.3"
   },
   "devDependencies": {
+    "apollo-server-testing": "^2.6.3",
     "chai": "^4.2.0",
     "faker": "^4.1.0",
     "mocha": "^6.1.4",
     "nodemon": "^1.19.1",
     "rosie": "^2.0.1",
-    "sinon": "^7.3.2",
-    "supertest": "^4.0.2"
+    "sinon": "^7.3.2"
   }
 }

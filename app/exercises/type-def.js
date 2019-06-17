@@ -1,17 +1,16 @@
 const { gql } = require('apollo-server')
 
 const typeDef = gql`
-  type User {
+  type Exercise {
     _id: ID!
     name: String!
-    email: String!
-    pictureUrl: String
+    user_id: ID!
     createdAt: String!
     updatedAt: String!
   }
 
   extend type Query {
-    currentUser: User
+    getExercise(exerciseId: ID!): Exercise
   }
 `
 

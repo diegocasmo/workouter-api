@@ -1,10 +1,8 @@
-require('../../../server')
 require('../../../test-utils/setup')
+const { constructServer } = require('../../../apollo-server')
+const { createTestClient } = require('apollo-server-testing')
 const { Factory } = require('rosie')
 const { expect } = require('chai')
-const sinon = require('sinon')
-const { API_URL } = require('../../../test-utils/api-url')
-const request = require('supertest')(API_URL)
 const users = require('../')
 
 describe('User Resolvers', () => {
@@ -27,30 +25,36 @@ describe('User Resolvers', () => {
     it('returns current user if authenticated', async () => {
       const user = await users.Model(Factory.build('user')).save()
       const { __v, ...expected } = user.toJSON()
-      sinon.stub(users.services, 'findOrCreateAuthUser').resolves(expected)
 
-      const { body } = await request
-        .post('/graphql')
-        .set('authorization', 'assume valid token')
-        .send({ query: CURRENT_USER_QUERY })
-      const actual = body.data.currentUser
+      // Assume expected user is authenticated
+      const { server } = constructServer({
+        context: () => ({ currentUser: expected })
+      })
 
-      expect(actual).to.be.eql({
+      const { query } = createTestClient(server)
+      const { data } = await query({
+        query: CURRENT_USER_QUERY
+      })
+
+      expect(data.currentUser).to.be.eql({
         ...expected,
         _id: `${expected._id}`,
         createdAt: `${expected.createdAt.getTime()}`,
         updatedAt: `${expected.updatedAt.getTime()}`
       })
-
-      users.services.findOrCreateAuthUser.restore()
     })
 
     it('requires authentication', async () => {
-      const { body } = await request
-        .post('/graphql')
-        .send({ query: CURRENT_USER_QUERY })
-      expect(body.data.currentUser).to.be.null
-      expect(body.errors[0].message).to.be.equal('You must be logged in')
+      // Assume there is no user authenticated
+      const { server } = constructServer({})
+
+      const { query } = createTestClient(server)
+      const { data, errors } = await query({
+        query: CURRENT_USER_QUERY
+      })
+
+      expect(data.currentUser).to.be.null
+      expect(errors[0].message).to.be.equal('You must be logged in')
     })
   })
 })
