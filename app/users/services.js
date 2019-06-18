@@ -1,4 +1,4 @@
-const UserModel = require('./user')
+const UserModel = require('./model')
 const { OAuth2Client } = require('google-auth-library')
 
 const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = process.env
@@ -17,7 +17,7 @@ const getUserFromToken = async idToken => {
   return { name, email, pictureUrl: picture}
 }
 
-// Find a user in DB by email
+// Find a user in DB by `email`
 const findUserWithEmail = async email => UserModel.findOne({ email })
 
 // Find a user if one exists, create a new one otherwise

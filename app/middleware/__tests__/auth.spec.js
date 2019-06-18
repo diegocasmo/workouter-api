@@ -19,6 +19,7 @@ describe('Auth Middleware', () => {
     try {
       authenticated(next)(null, null, ctx)
     } catch (err) {
+      expect(next.called).to.be.false
       expect(err.message).to.be.equal('You must be logged in')
     }
   })
