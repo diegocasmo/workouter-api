@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator')
 
 const Exercise = new mongoose.Schema({
   name: {
@@ -10,8 +9,14 @@ const Exercise = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     required: [true, 'Exercise user_id is required']
   },
+  createdAt: {
+    type: Date,
+    immutable: true
+  },
+  updatedAt: {
+    type: Date,
+    immutable: true
+  }
 }, { timestamps: true })
-
-Exercise.plugin(uniqueValidator, { message: 'Exercise {PATH} must be unique' })
 
 module.exports = mongoose.model('Exercise', Exercise)

@@ -12,6 +12,10 @@ const typeDef = gql`
   extend type Query {
     getExercise(exerciseId: ID!): Exercise
   }
+
+  extend type Mutation {
+    createExercise(name: String!): Exercise
+  }
 `
 
 module.exports = {
