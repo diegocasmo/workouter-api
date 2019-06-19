@@ -16,6 +16,14 @@ const UserSchema = new mongoose.Schema({
   },
   pictureUrl: {
     type: String
+  },
+  createdAt: {
+    type: Date,
+    immutable: true
+  },
+  updatedAt: {
+    type: Date,
+    immutable: true
   }
 }, { timestamps: true })
 

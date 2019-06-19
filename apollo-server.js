@@ -4,6 +4,7 @@ const exercises = require('./app/exercises')
 
 const typeDef = gql`
   type Query
+  type Mutation
 `
 
 const defaultContext = async ({ req }) => {

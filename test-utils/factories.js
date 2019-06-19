@@ -9,5 +9,5 @@ Factory.define('user')
   .attr('pictureUrl', () => faker.image.imageUrl())
 
 Factory.define('exercise')
-  .attr('user_id', () => `${mongoose.Types.ObjectId()}`)
+  .attr('user_id', () => mongoose.Types.ObjectId())
   .attr('name', () => faker.lorem.words())

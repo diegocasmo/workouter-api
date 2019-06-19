@@ -18,17 +18,21 @@ const getUserFromToken = async idToken => {
 }
 
 // Find a user in DB by `email`
-const findUserWithEmail = async email => UserModel.findOne({ email })
+const findUserByEmail = async email => UserModel.findOne({ email })
+
+// Find a user in DB by `_id`
+const findUserById = async id => UserModel.findOne(id)
 
 // Find a user if one exists, create a new one otherwise
 const findOrCreateUser = async attrs => {
-  const user = await findUserWithEmail(attrs.email)
+  const user = await findUserByEmail(attrs.email)
   return user
     ? user
     : UserModel(attrs).save()
 }
 
 module.exports = {
-  findUserWithEmail,
+  findUserByEmail,
+  findUserById,
   findOrCreateAuthUser
 }

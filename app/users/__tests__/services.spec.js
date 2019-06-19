@@ -2,21 +2,36 @@ require('../../../test-utils/setup')
 const { Factory } = require('rosie')
 const { expect } = require('chai')
 const { OAuth2Client } = require('google-auth-library')
+const mongoose = require('mongoose')
 const sinon = require('sinon')
 const users = require('../')
 
 describe('User Service', () => {
 
-  describe('findUserWithEmail', () => {
+  describe('findUserByEmail', () => {
 
     it('returns a user if it exists', async () => {
       const expected = await users.Model(Factory.build('user')).save()
-      const actual = await users.services.findUserWithEmail(expected.email)
-      expect(expected.toJSON()).to.be.eql(actual.toJSON())
+      const actual = await users.services.findUserByEmail(expected.email)
+      expect(actual.toJSON()).to.be.eql(expected.toJSON())
     })
 
     it('returns null if no user exists', async () => {
-      const res = await users.services.findUserWithEmail('invalid email')
+      const res = await users.services.findUserByEmail('non-existent email')
+      expect(res).to.be.null
+    })
+  })
+
+  describe('findUserById', () => {
+
+    it('returns a user if it exists', async () => {
+      const expected = await users.Model(Factory.build('user')).save()
+      const actual = await users.services.findUserById(expected._id)
+      expect(actual.toJSON()).to.be.eql(expected.toJSON())
+    })
+
+    it('returns null if no user exists', async () => {
+      const res = await users.services.findUserById(mongoose.Types.ObjectId())
       expect(res).to.be.null
     })
   })
