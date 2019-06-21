@@ -7,6 +7,10 @@ const mongoURI = isProduction()
   ? MONGO_PROD_URI
   : (isDevelopment() ? MONGO_DEV_URI : MONGO_TEST_URI)
 
-mongoose.connect(mongoURI, { useCreateIndex: true, useNewUrlParser: true })
+mongoose.connect(mongoURI, {
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    useFindAndModify: false
+  })
   .then(() => console.log('DB connected'))
   .catch((err) => console.error(err))

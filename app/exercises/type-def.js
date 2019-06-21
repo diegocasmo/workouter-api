@@ -4,7 +4,7 @@ const typeDef = gql`
   type Exercise {
     _id: ID!
     name: String!
-    user_id: ID!
+    author: User!
     createdAt: String!
     updatedAt: String!
   }
@@ -15,6 +15,7 @@ const typeDef = gql`
 
   extend type Mutation {
     createExercise(name: String!): Exercise
+    updateExercise(exerciseId: ID!, name: String!): Exercise
   }
 `
 

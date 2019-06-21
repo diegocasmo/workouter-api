@@ -8,17 +8,14 @@ const typeDef = gql`
 `
 
 const defaultContext = async ({ req }) => {
-  let authToken = null
-  let currentUser = null
-
-  try {
-    authToken = req.headers.authorization
-    if (authToken) {
-      currentUser = await users.services.findOrCreateAuthUser(authToken)
-    }
-  } catch (err) {
-    console.error(`Unable to authenticate user with token ${authToken}`)
-  }
+  // Retrieve authorization token
+  const authToken = req
+    ? req.headers.authorization
+    : null
+  // Attempt to find user using the authorization token
+  const currentUser = authToken
+    ? await users.services.findOrCreateAuthUser(authToken)
+    : null
 
   return { currentUser }
 }

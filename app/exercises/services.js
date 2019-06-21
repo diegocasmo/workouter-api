@@ -1,23 +1,36 @@
 const ExerciseModel = require('./model')
 const users = require('../users/')
 
-// Find an exercise given its `_id` and `user_id`
-const getExercise = async ({ exerciseId, userId }) => (
-  ExerciseModel.findOne({ _id: exerciseId, user_id: userId })
+// Find an exercise given its `_id` and `author`
+const getExercise = async ({ exerciseId, author }) => (
+  ExerciseModel.findOne({ _id: exerciseId, author }).populate('author')
 )
 
 // Create an exercise with the given attributes. Validates
-// the exercise `user_id` exists
-const createExercise = async ({ name, userId }) => {
-  const user = await users.services.findUserById(userId)
-  if (user) {
-    return ExerciseModel({ name, user_id: userId }).save()
-  } else {
-    throw new Error('Exercise user_id does not exist')
-  }
+// the exercise `author` exists
+const createExercise = async ({ name, author }) => {
+  const user = await users.services.findUserById(author)
+  if (!user) { throw new Error('Exercise author does not exist') }
+
+  const exercise = await ExerciseModel({ name, author }).save()
+  return ExerciseModel.populate(exercise, 'author')
+}
+
+// Update an exercise attributes. Validates the `author` exists
+// and its whether the `author` is the owner of the exercise or not
+const updateExercise = async ({ exerciseId, author, ...attrs }) => {
+  // Check exercise exists and author is the actual owner
+  const exercise = await getExercise({ exerciseId, author })
+  if (!exercise) { throw new Error('Exercise does not exist') }
+
+  // Update exercise attributes
+  exercise.set(attrs)
+
+  return ExerciseModel.populate(exercise, 'author')
 }
 
 module.exports = {
   getExercise,
-  createExercise
+  createExercise,
+  updateExercise
 }

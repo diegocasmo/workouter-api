@@ -1,4 +1,4 @@
-const { authenticated } = require('../middleware/auth')
+const { authenticated } = require('../middleware/authentication')
 
 const resolvers = {
   Query: {
