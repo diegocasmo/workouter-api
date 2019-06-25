@@ -173,16 +173,18 @@ describe('Exercise Resolvers', () => {
 
       // Update exercise
       const name = 'foo bar'
+      const expected = { ...exercise.toJSON(), name }
       const { mutate } = createTestClient(server)
       const { data } = await mutate({
         mutation: UPDATE_EXERCISE_MUTATION,
-        variables: { exerciseId: `${exercise._id}`, name }
+        variables: { exerciseId: `${expected._id}`, name }
       })
 
       const actual = data.updateExercise
-      expect(actual._id).to.not.be.null
+
+      expect(actual._id).to.be.equal(`${expected._id}`)
       expect(actual.name).to.be.equal(name)
-      expect(actual.author._id).to.be.equal(`${exercise.author._id}`)
+      expect(actual.author._id).to.be.equal(`${expected.author._id}`)
       expect(actual.createdAt).to.not.be.null
       expect(actual.updatedAt).to.not.be.null
     })
@@ -198,6 +200,70 @@ describe('Exercise Resolvers', () => {
       })
 
       expect(data.updateExercise).to.be.null
+      expect(errors[0].message).to.be.equal('You must be logged in')
+    })
+  })
+
+  describe('deleteExercise', () => {
+
+    const DELETE_EXERCISE_MUTATION = `
+      mutation deleteExercise($exerciseId: ID!) {
+        deleteExercise(exerciseId: $exerciseId) {
+          _id
+          name
+          author {
+            _id
+            name
+            email
+            pictureUrl
+            createdAt
+            updatedAt
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    `
+
+    it('deletes an exercise', async () => {
+      const currentUser = await users.Model(Factory.build('user')).save()
+
+      // Assume user is authenticated
+      const { server } = constructServer({
+        context: () => ({ currentUser })
+      })
+
+      // Create valid exercise in DB
+      const expected = await exercises.Model(Factory.build('exercise', { author: currentUser._id })).save()
+
+      // Delete exercise
+      const { mutate } = createTestClient(server)
+      const { data } = await mutate({
+        mutation: DELETE_EXERCISE_MUTATION,
+        variables: { exerciseId: `${expected._id}` }
+      })
+
+      const actual = data.deleteExercise
+      const exerciseInDb = await exercises.Model.findOne(expected._id)
+
+      expect(exerciseInDb).to.be.null
+      expect(actual._id).to.be.equal(`${expected._id}`)
+      expect(actual.author._id).to.be.equal(`${expected.author._id}`)
+      expect(actual.createdAt).to.not.be.null
+      expect(actual.updatedAt).to.not.be.null
+    })
+
+    it('requires authenticated', async () => {
+      // Assume there is no user authenticated
+      const { server } = constructServer({})
+
+      const { mutate } = createTestClient(server)
+      const { data, errors } = await mutate({
+        mutation: DELETE_EXERCISE_MUTATION,
+        variables: { exerciseId: '123' }
+      })
+
+      expect(data.deleteExercise).to.be.null
       expect(errors[0].message).to.be.equal('You must be logged in')
     })
   })

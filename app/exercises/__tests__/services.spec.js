@@ -61,8 +61,8 @@ describe('Exercise Service', () => {
 
     it('updates an existing exercise', async () => {
       // Create an exercise in DB
-      const owner = await users.Model(Factory.build('user')).save()
-      let exercise = await exercises.Model(Factory.build('exercise', { author: owner._id })).save()
+      const author = await users.Model(Factory.build('user')).save()
+      let exercise = await exercises.Model(Factory.build('exercise', { author: author._id })).save()
       exercise = await exercises.Model.populate(exercise, 'author')
 
       // Update exercise
@@ -70,17 +70,17 @@ describe('Exercise Service', () => {
       const actual = await exercises.services.updateExercise({
         exerciseId: exercise._id,
         name,
-        author: owner._id
+        author: author._id
       })
 
       const expected = { ...exercise.toJSON(), name }
       expect(actual.toJSON()).to.be.eql(expected)
     })
 
-    it('validates user is the owner of the exercise', async () => {
+    it('validates user is the author of the exercise', async () => {
       // Create an exercise in DB
-      const owner = await users.Model(Factory.build('user')).save()
-      const exercise = await exercises.Model(Factory.build('exercise', { author: owner._id })).save()
+      const author = await users.Model(Factory.build('user')).save()
+      const exercise = await exercises.Model(Factory.build('exercise', { author: author._id })).save()
 
       // Create another user
       const otherUser = await users.Model(Factory.build('user')).save()
@@ -100,8 +100,8 @@ describe('Exercise Service', () => {
 
     it('validates updated attributes', async () => {
       // Create an exercise in DB
-      const owner = await users.Model(Factory.build('user')).save()
-      const exercise = await exercises.Model(Factory.build('exercise', { author: owner._id })).save()
+      const author = await users.Model(Factory.build('user')).save()
+      const exercise = await exercises.Model(Factory.build('exercise', { author: author._id })).save()
 
       // Attempt to update exercise with an invalid `name`
       try {
@@ -109,11 +109,60 @@ describe('Exercise Service', () => {
         await exercises.services.updateExercise({
           exerciseId: exercise._id,
           name,
-          author: owner._id
+          author: author._id
         })
         const res = await exercises.Model.find({})
       } catch ({ errors }) {
         expect(errors.name.message).to.be.equal('Exercise name is required')
+      }
+    })
+  })
+
+  describe('deleteExercise', () => {
+
+    it('deletes an exercise', async () => {
+      // Create an exercise in DB
+      const author = await users.Model(Factory.build('user')).save()
+      let expected = await exercises.Model(Factory.build('exercise', { author: author._id })).save()
+      expected = await exercises.Model.populate(expected, 'author')
+
+      // Delete exercise from DB
+      const actual = await exercises.services.deleteExercise({ exerciseId: expected._id, author: author._id })
+
+      // Verify exercise was deleted from DB and attributes of the
+      // deleted exercise returned by the service
+      const exerciseInDb = await exercises.Model.findOne(expected._id)
+      expect(exerciseInDb).to.be.null
+      expect(actual.toJSON()).to.be.eql(expected.toJSON())
+    })
+
+    it('validates user is the author of the exercise', async () => {
+      // Create an exercise in DB
+      const author = await users.Model(Factory.build('user')).save()
+      const exercise = await exercises.Model(Factory.build('exercise', { author: author._id })).save()
+
+      // Create another user
+      const otherUser = await users.Model(Factory.build('user')).save()
+
+      // Attempt to delete exercise with the wrong user
+      try {
+        await exercises.services.deleteExercise({
+          exerciseId: exercise._id,
+          author: otherUser._id
+        })
+      } catch (err) {
+        expect(err.message).to.be.equal('Exercise does not exist')
+      }
+    })
+
+    it('returns an error if exercise doesn\'t exist', async () => {
+      try {
+        await exercises.services.deleteExercise({
+          exerciseId: mongoose.Types.ObjectId(),
+          author: mongoose.Types.ObjectId()
+        })
+      } catch (err) {
+        expect(err.message).to.be.equal('Exercise does not exist')
       }
     })
   })
