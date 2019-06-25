@@ -16,8 +16,8 @@ const createExercise = async ({ name, author }) => {
   return ExerciseModel.populate(exercise, 'author')
 }
 
-// Update an exercise attributes. Validates the `author` exists
-// and its whether the `author` is the owner of the exercise or not
+// Update an exercise attributes. Validates if the `author` is the
+// owner of the exercise or not, throws an error if not
 const updateExercise = async ({ exerciseId, author, ...attrs }) => {
   // Check exercise exists and author is the actual owner
   const exercise = await getExercise({ exerciseId, author })
@@ -29,8 +29,22 @@ const updateExercise = async ({ exerciseId, author, ...attrs }) => {
   return ExerciseModel.populate(exercise, 'author')
 }
 
+// Delete an exercise from DB. Validates if the `author` is the
+// owner of the exercise or not, throws an error if not
+const deleteExercise = async ({ exerciseId, author }) => {
+  // Check exercise exists and author is the actual owner
+  const exercise = await getExercise({ exerciseId, author })
+  if (!exercise) { throw new Error('Exercise does not exist') }
+
+  // Delete exercise
+  exercise.delete()
+
+  return ExerciseModel.populate(exercise, 'author')
+}
+
 module.exports = {
   getExercise,
   createExercise,
-  updateExercise
+  updateExercise,
+  deleteExercise
 }

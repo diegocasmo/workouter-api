@@ -16,6 +16,7 @@ const typeDef = gql`
   extend type Mutation {
     createExercise(name: String!): Exercise
     updateExercise(exerciseId: ID!, name: String!): Exercise
+    deleteExercise(exerciseId: ID!): Exercise
   }
 `
 
