@@ -20,11 +20,11 @@ describe('Exercise Model', () => {
       expect(errors.name.message).to.be.equal('Exercise name is required')
     })
 
-    it('requires a user_id', async () => {
+    it('requires a author', async () => {
       try {
-        await exercises.Model(Factory.build('exercise', { user_id: null })).save()
+        await exercises.Model(Factory.build('exercise', { author: null })).save()
       } catch({ errors }) {
-        expect(errors.user_id.message).to.be.equal('Exercise user_id is required')
+        expect(errors.author.message).to.be.equal('Exercise author is required')
       }
     })
   })

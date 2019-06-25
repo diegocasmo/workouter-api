@@ -5,9 +5,11 @@ const Exercise = new mongoose.Schema({
     type: String,
     required: [true, 'Exercise name is required']
   },
-  user_id: {
+  author: {
     type: mongoose.Schema.ObjectId,
-    required: [true, 'Exercise user_id is required']
+    required: [true, 'Exercise author is required'],
+    immutable: true,
+    ref: 'User'
   },
   createdAt: {
     type: Date,

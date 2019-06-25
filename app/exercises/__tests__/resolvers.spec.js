@@ -16,14 +16,23 @@ describe('Exercise Resolvers', () => {
         getExercise(exerciseId: $exerciseId) {
           _id
           name
-          user_id
+          author {
+            _id
+            name
+            email
+            pictureUrl
+            createdAt
+            updatedAt
+          }
           createdAt
           updatedAt
         }
       }
     `
+
     it('returns exercise if it exists', async () => {
-      const currentUser = await users.Model(Factory.build('user')).save()
+      let currentUser = await users.Model(Factory.build('user')).save({ versionKey: false })
+      currentUser = currentUser.toJSON({ versionKey: false })
 
       // Assume user is authenticated
       const { server } = constructServer({
@@ -31,22 +40,26 @@ describe('Exercise Resolvers', () => {
       })
 
       // Create an exercise that belongs to the user
-      const attrs = Factory.build('exercise', { user_id: currentUser._id })
-      const exercise = await exercises.Model(attrs).save()
-      const { __v, ...expected } = exercise.toJSON()
+      let exercise = await exercises.Model(Factory.build('exercise', { author: currentUser._id })).save()
+      exercise = exercise.toJSON({ versionKey: false })
 
       const { query } = createTestClient(server)
       const { data } = await query({
         query: GET_EXERCISE_QUERY,
-        variables: { exerciseId: `${expected._id}` }
+        variables: { exerciseId: `${exercise._id}` }
       })
 
       expect(data.getExercise).to.be.eql({
-        ...expected,
-        _id: `${expected._id}`,
-        user_id: `${expected.user_id}`,
-        createdAt: `${expected.createdAt.getTime()}`,
-        updatedAt: `${expected.updatedAt.getTime()}`
+        ...exercise,
+        _id: `${exercise._id}`,
+        author: {
+          ...currentUser,
+          _id: `${currentUser._id}`,
+          createdAt: `${currentUser.createdAt.getTime()}`,
+          updatedAt: `${currentUser.updatedAt.getTime()}`
+        },
+        createdAt: `${exercise.createdAt.getTime()}`,
+        updatedAt: `${exercise.updatedAt.getTime()}`
       })
     })
 
@@ -72,12 +85,20 @@ describe('Exercise Resolvers', () => {
         createExercise(name: $name) {
           _id
           name
-          user_id
+          author {
+            _id
+            name
+            email
+            pictureUrl
+            createdAt
+            updatedAt
+          }
           createdAt
           updatedAt
         }
       }
     `
+
     it('returns created exercise if valid', async () => {
       const currentUser = await users.Model(Factory.build('user')).save()
 
@@ -87,18 +108,18 @@ describe('Exercise Resolvers', () => {
       })
 
       // Create valid exercise attributes
-      const expected = Factory.build('exercise', { user_id: currentUser._id })
+      const expected = Factory.build('exercise', { author: currentUser._id })
 
       const { mutate } = createTestClient(server)
       const { data } = await mutate({
         mutation: CREATE_EXERCISE_MUTATION,
-        variables: { name: `${expected.name}` }
+        variables: { name: expected.name }
       })
 
       const actual = data.createExercise
       expect(actual._id).to.not.be.null
       expect(actual.name).to.be.equal(expected.name)
-      expect(actual.user_id).to.be.equal(`${expected.user_id}`)
+      expect(actual.author._id).to.be.equal(`${expected.author._id}`)
       expect(actual.createdAt).to.not.be.null
       expect(actual.updatedAt).to.not.be.null
     })
@@ -114,6 +135,69 @@ describe('Exercise Resolvers', () => {
       })
 
       expect(data.createExercise).to.be.null
+      expect(errors[0].message).to.be.equal('You must be logged in')
+    })
+  })
+
+  describe('updateExercise', () => {
+
+    const UPDATE_EXERCISE_MUTATION = `
+      mutation updateExercise($exerciseId: ID!, $name: String!) {
+        updateExercise(exerciseId: $exerciseId, name: $name) {
+          _id
+          name
+          author {
+            _id
+            name
+            email
+            pictureUrl
+            createdAt
+            updatedAt
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    `
+
+    it('returns updated exercise if valid', async () => {
+      const currentUser = await users.Model(Factory.build('user')).save()
+
+      // Assume user is authenticated
+      const { server } = constructServer({
+        context: () => ({ currentUser })
+      })
+
+      // Create valid exercise in DB
+      const exercise = await exercises.Model(Factory.build('exercise', { author: currentUser._id })).save()
+
+      // Update exercise
+      const name = 'foo bar'
+      const { mutate } = createTestClient(server)
+      const { data } = await mutate({
+        mutation: UPDATE_EXERCISE_MUTATION,
+        variables: { exerciseId: `${exercise._id}`, name }
+      })
+
+      const actual = data.updateExercise
+      expect(actual._id).to.not.be.null
+      expect(actual.name).to.be.equal(name)
+      expect(actual.author._id).to.be.equal(`${exercise.author._id}`)
+      expect(actual.createdAt).to.not.be.null
+      expect(actual.updatedAt).to.not.be.null
+    })
+
+    it('requires authentication', async () => {
+      // Assume there is no user authenticated
+      const { server } = constructServer({})
+
+      const { mutate } = createTestClient(server)
+      const { data, errors } = await mutate({
+        mutation: UPDATE_EXERCISE_MUTATION,
+        variables: { exerciseId: '123', name: 'foo bar' }
+      })
+
+      expect(data.updateExercise).to.be.null
       expect(errors[0].message).to.be.equal('You must be logged in')
     })
   })
