@@ -1,9 +1,33 @@
 const ExerciseModel = require('./model')
 const users = require('../users/')
 
+// Fetch a paginated array of exercises sorted by ascending name
+const fetchExercises = async ({ author, offset = 0, perPage = 12 }) => (
+  ExerciseModel.aggregate()
+    // Match user exercises' only
+    .match({ author })
+    // Create temp `lowerCaseName` attribute to sort exercises by
+    .addFields({ 'lowerCaseName': { '$toLower': '$name' } })
+    .sort({ 'lowerCaseName': 1 })
+    .project({ 'lowerCaseName': 0 })
+    // Perform pagination
+    .skip(offset)
+    .limit(perPage)
+    // Populate `author` (can't use Mongoose `populate` method with `aggregate`)
+    .lookup({
+      'from': 'users',
+      'localField': 'author',
+      'foreignField': '_id',
+      'as': 'author'
+    })
+    .unwind('author')
+)
+
 // Find an exercise given its `_id` and `author`
 const getExercise = async ({ exerciseId, author }) => (
-  ExerciseModel.findOne({ _id: exerciseId, author }).populate('author')
+  ExerciseModel
+    .findOne({ _id: exerciseId, author })
+    .populate('author')
 )
 
 // Create an exercise with the given attributes. Validates
@@ -43,6 +67,7 @@ const deleteExercise = async ({ exerciseId, author }) => {
 }
 
 module.exports = {
+  fetchExercises,
   getExercise,
   createExercise,
   updateExercise,
