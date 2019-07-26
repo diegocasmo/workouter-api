@@ -1,9 +1,22 @@
 const { authenticated } = require('../middleware/authentication')
-const { getExercise, createExercise, updateExercise, deleteExercise } = require('./services')
 const mongoose = require('mongoose')
+const {
+  fetchExercises,
+  getExercise,
+  createExercise,
+  updateExercise,
+  deleteExercise
+} = require('./services')
 
 const resolvers = {
   Query: {
+    fetchExercises: authenticated((root, { offset, limit }, { currentUser }) =>
+      fetchExercises({
+        author: currentUser._id,
+        offset,
+        limit
+      })
+    ),
     getExercise: authenticated((root, { exerciseId }, { currentUser }) =>
       getExercise({
         exerciseId: mongoose.Types.ObjectId(exerciseId),

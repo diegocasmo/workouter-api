@@ -7,6 +7,30 @@ const exercises = require('../')
 
 describe('Exercise Service', () => {
 
+  describe('fetchExercises', () => {
+
+    it('returns paginated exercises sorted by ascending name', async () => {
+      // Insert a list of exercises in DB
+      const user = await users.Model(Factory.build('user')).save()
+      const res = await exercises.Model.insertMany(Factory.buildList('exercise', 20, { author: user._id }))
+
+      // Retrieve paginated exercises
+      const firstPage = await exercises.services.fetchExercises({ author: user._id, offset: 0, perPage: 10 })
+      const secondPage = await exercises.services.fetchExercises({ author: user._id, offset: 10, perPage: 10 })
+
+      // Verify exercises were correctly paginated
+      const expected = res
+        .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+        .map(x => ({
+          ...x.toJSON(),
+          author: user.toJSON()
+        }))
+
+      expect(firstPage).to.be.eql(expected.slice(0, 10))
+      expect(secondPage).to.be.eql(expected.slice(10, 20))
+    })
+  })
+
   describe('getExercise', () => {
 
     it('returns an exercise if it exists', async () => {

@@ -11,6 +11,7 @@ const typeDef = gql`
 
   extend type Query {
     getExercise(exerciseId: ID!): Exercise
+    fetchExercises(offset: Int!, limit: Int!): [Exercise]
   }
 
   extend type Mutation {
