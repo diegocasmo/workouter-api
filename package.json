@@ -11,20 +11,20 @@
     "test": "NODE_ENV=test mocha **/*.spec.js"
   },
   "dependencies": {
-    "apollo-server": "^2.7.1",
+    "apollo-server": "^2.8.1",
     "dotenv": "^8.0.0",
-    "google-auth-library": "^5.1.0",
+    "google-auth-library": "^5.2.0",
     "graphql": "^14.4.2",
-    "mongoose": "^5.6.6",
+    "mongoose": "^5.6.9",
     "mongoose-unique-validator": "^2.0.3"
   },
   "devDependencies": {
-    "apollo-server-testing": "^2.7.1",
+    "apollo-server-testing": "^2.8.1",
     "chai": "^4.2.0",
     "faker": "^4.1.0",
     "mocha": "^6.2.0",
     "nodemon": "^1.19.1",
     "rosie": "^2.0.1",
-    "sinon": "^7.3.2"
+    "sinon": "^7.4.1"
   }
 }
