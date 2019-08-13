@@ -1,6 +1,6 @@
 # Workouter API
 
-API for [Workouter UI](https://github.com/diegocasmo/workouter-ui).
+API for Workouter.
 
 *Note: This is still work in progress. More documentation is on its way :).*
 
