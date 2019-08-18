@@ -1,4 +1,3 @@
-require('../../../test-utils/setup')
 const { constructServer } = require('../../../apollo-server')
 const { createTestClient } = require('apollo-server-testing')
 const { Factory } = require('rosie')

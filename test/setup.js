@@ -1,6 +1,5 @@
 require('dotenv').config()
 require('../config/db')
-require('../test-utils/factories')
 const { connection } = require('mongoose')
 const users = require('../app/users')
 const exercises = require('../app/exercises')
@@ -11,7 +10,6 @@ before((done) => connection.once('open', done))
 
 // Clean up all collections after each test
 afterEach(async () => {
-  const { collections } = connection
   return Promise.all([
     users.Model.deleteMany({}),
     exercises.Model.deleteMany({})
@@ -23,6 +21,3 @@ afterEach(async () => {
     }
   })
 })
-
-// Close DB connection once the entire test suite has finished running
-after((done) => connection.close(done))

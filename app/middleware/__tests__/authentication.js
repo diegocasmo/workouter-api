@@ -1,4 +1,3 @@
-require('../../../test-utils/setup')
 const { Factory } = require('rosie')
 const { expect } = require('chai')
 const sinon  = require('sinon')

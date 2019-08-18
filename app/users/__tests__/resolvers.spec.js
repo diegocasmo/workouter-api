@@ -1,9 +1,16 @@
-require('../../../test-utils/setup')
 const { constructServer } = require('../../../apollo-server')
 const { createTestClient } = require('apollo-server-testing')
 const { Factory } = require('rosie')
 const { expect } = require('chai')
 const users = require('../')
+
+const transformUserToResolverTypes = (x) => ({
+  ...x.toJSON({ versionKey: false }),
+  _id: `${x._id}`,
+  createdAt: `${x.createdAt.getTime()}`,
+  updatedAt: `${x.updatedAt.getTime()}`
+})
+
 
 describe('User Resolvers', () => {
 
@@ -24,7 +31,7 @@ describe('User Resolvers', () => {
 
     it('returns current user if authenticated', async () => {
       const user = await users.Model(Factory.build('user')).save()
-      const { __v, ...expected } = user.toJSON()
+      const expected = transformUserToResolverTypes(user)
 
       // Assume expected user is authenticated
       const { server } = constructServer({
@@ -36,12 +43,7 @@ describe('User Resolvers', () => {
         query: CURRENT_USER_QUERY
       })
 
-      expect(data.currentUser).to.be.eql({
-        ...expected,
-        _id: `${expected._id}`,
-        createdAt: `${expected.createdAt.getTime()}`,
-        updatedAt: `${expected.updatedAt.getTime()}`
-      })
+      expect(data.currentUser).to.be.eql(expected)
     })
 
     it('requires authentication', async () => {

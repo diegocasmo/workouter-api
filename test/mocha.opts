@@ -1,0 +1,3 @@
+--file './test/setup.js'
+--file './test/factories.js'
+--file './test/teardown.js'

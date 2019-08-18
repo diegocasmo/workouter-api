@@ -1,7 +1,5 @@
-require('../../../test-utils/setup')
 const { Factory } = require('rosie')
 const { expect } = require('chai')
-const users = require('../../users/')
 const exercises = require('../')
 
 describe('Exercise Model', () => {
