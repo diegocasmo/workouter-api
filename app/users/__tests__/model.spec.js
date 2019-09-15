@@ -3,7 +3,6 @@ const { expect } = require('chai')
 const users = require('../')
 
 describe('User Model', () => {
-
   it('can create a valid user', async () => {
     const user = users.Model(Factory.build('user'))
     const expected = await user.save()
@@ -12,7 +11,6 @@ describe('User Model', () => {
   })
 
   describe('validation', () => {
-
     it('requires a name', () => {
       let user = users.Model({ name: '' })
       const { errors } = user.validateSync()
@@ -28,7 +26,9 @@ describe('User Model', () => {
     it('requires a valid email', () => {
       let user = users.Model({ email: 'invalid email' })
       const { errors } = user.validateSync()
-      expect(errors.email.message).to.be.equal('User email must be a valid email address')
+      expect(errors.email.message).to.be.equal(
+        'User email must be a valid email address'
+      )
     })
 
     it('requires email to be unique', async () => {
@@ -42,7 +42,7 @@ describe('User Model', () => {
       try {
         const invalidUser = users.Model(Factory.build('user', { email }))
         await invalidUser.save()
-      } catch({ errors }) {
+      } catch ({ errors }) {
         expect(errors.email.message).to.be.equal('User email must be unique')
       }
     })

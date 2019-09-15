@@ -5,5 +5,5 @@ const isTest = () => process.env.NODE_ENV === 'test'
 module.exports = {
   isProduction,
   isDevelopment,
-  isTest: isTest
+  isTest: isTest,
 }

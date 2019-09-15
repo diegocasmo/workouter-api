@@ -12,9 +12,12 @@ const findOrCreateAuthUser = async idToken => {
 
 // Retrieve user given an ID token
 const getUserFromToken = async idToken => {
-  const ticket = await client.verifyIdToken({ idToken, audience: OAUTH_CLIENT_ID })
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: OAUTH_CLIENT_ID,
+  })
   const { name, email, picture } = ticket.getPayload()
-  return { name, email, pictureUrl: picture}
+  return { name, email, pictureUrl: picture }
 }
 
 // Find a user in DB by `email`
@@ -26,13 +29,11 @@ const findUserById = async id => UserModel.findOne(id)
 // Find a user if one exists, create a new one otherwise
 const findOrCreateUser = async attrs => {
   const user = await findUserByEmail(attrs.email)
-  return user
-    ? user
-    : UserModel(attrs).save()
+  return user ? user : UserModel(attrs).save()
 }
 
 module.exports = {
   findUserByEmail,
   findUserById,
-  findOrCreateAuthUser
+  findOrCreateAuthUser,
 }

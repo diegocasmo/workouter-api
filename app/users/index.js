@@ -7,5 +7,5 @@ module.exports = {
   Model,
   resolvers,
   typeDef,
-  services
+  services,
 }

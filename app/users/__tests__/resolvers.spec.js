@@ -4,18 +4,15 @@ const { Factory } = require('rosie')
 const { expect } = require('chai')
 const users = require('../')
 
-const transformUserToResolverTypes = (x) => ({
+const transformUserToResolverTypes = x => ({
   ...x.toJSON({ versionKey: false }),
   _id: `${x._id}`,
   createdAt: `${x.createdAt.getTime()}`,
-  updatedAt: `${x.updatedAt.getTime()}`
+  updatedAt: `${x.updatedAt.getTime()}`,
 })
 
-
 describe('User Resolvers', () => {
-
   describe('currentUser', () => {
-
     const CURRENT_USER_QUERY = `
       {
         currentUser {
@@ -35,12 +32,12 @@ describe('User Resolvers', () => {
 
       // Assume expected user is authenticated
       const { server } = constructServer({
-        context: () => ({ currentUser: expected })
+        context: () => ({ currentUser: expected }),
       })
 
       const { query } = createTestClient(server)
       const { data } = await query({
-        query: CURRENT_USER_QUERY
+        query: CURRENT_USER_QUERY,
       })
 
       expect(data.currentUser).to.be.eql(expected)
@@ -52,7 +49,7 @@ describe('User Resolvers', () => {
 
       const { query } = createTestClient(server)
       const { data, errors } = await query({
-        query: CURRENT_USER_QUERY
+        query: CURRENT_USER_QUERY,
       })
 
       expect(data.currentUser).to.be.null

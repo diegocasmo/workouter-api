@@ -3,7 +3,6 @@ const { expect } = require('chai')
 const exercises = require('../')
 
 describe('Exercise Model', () => {
-
   it('can create a valid exercise', async () => {
     const expected = await exercises.Model(Factory.build('exercise')).save()
     const actual = await exercises.Model.findOne(expected._id)
@@ -11,7 +10,6 @@ describe('Exercise Model', () => {
   })
 
   describe('validation', () => {
-
     it('requires a name', () => {
       const exercise = exercises.Model(Factory.build('exercise', { name: '' }))
       const { errors } = exercise.validateSync()
@@ -20,8 +18,10 @@ describe('Exercise Model', () => {
 
     it('requires a author', async () => {
       try {
-        await exercises.Model(Factory.build('exercise', { author: null })).save()
-      } catch({ errors }) {
+        await exercises
+          .Model(Factory.build('exercise', { author: null }))
+          .save()
+      } catch ({ errors }) {
         expect(errors.author.message).to.be.equal('Exercise author is required')
       }
     })

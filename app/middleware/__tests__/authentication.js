@@ -1,10 +1,9 @@
 const { Factory } = require('rosie')
 const { expect } = require('chai')
-const sinon  = require('sinon')
+const sinon = require('sinon')
 const { authenticated } = require('../authentication')
 
 describe('Auth Middleware', () => {
-
   it('calls next if user is authenticated', () => {
     const ctx = { currentUser: Factory.build('user') }
     const next = sinon.spy()

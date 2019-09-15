@@ -5,7 +5,7 @@ const {
   getExercise,
   createExercise,
   updateExercise,
-  deleteExercise
+  deleteExercise,
 } = require('./services')
 
 const resolvers = {
@@ -14,39 +14,40 @@ const resolvers = {
       fetchExercises({
         author: currentUser._id,
         offset,
-        limit
+        limit,
       })
     ),
     getExercise: authenticated((root, { exerciseId }, { currentUser }) =>
       getExercise({
         exerciseId: mongoose.Types.ObjectId(exerciseId),
-        author: currentUser._id
+        author: currentUser._id,
       })
-    )
+    ),
   },
   Mutation: {
     createExercise: authenticated((root, { name }, { currentUser }) =>
       createExercise({
         name,
-        author: currentUser._id
+        author: currentUser._id,
       })
     ),
-    updateExercise: authenticated((root, { exerciseId, name }, { currentUser }) =>
-      updateExercise({
-        exerciseId: mongoose.Types.ObjectId(exerciseId),
-        name,
-        author: currentUser._id
-      })
+    updateExercise: authenticated(
+      (root, { exerciseId, name }, { currentUser }) =>
+        updateExercise({
+          exerciseId: mongoose.Types.ObjectId(exerciseId),
+          name,
+          author: currentUser._id,
+        })
     ),
     deleteExercise: authenticated((root, { exerciseId }, { currentUser }) =>
       deleteExercise({
         exerciseId: mongoose.Types.ObjectId(exerciseId),
-        author: currentUser._id
+        author: currentUser._id,
       })
-    )
-  }
+    ),
+  },
 }
 
 module.exports = {
-  resolvers
+  resolvers,
 }

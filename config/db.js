@@ -5,12 +5,15 @@ const { isProduction, isDevelopment, isTest } = require('./environment')
 const { MONGO_PROD_URI, MONGO_DEV_URI, MONGO_TEST_URI } = process.env
 const mongoURI = isProduction()
   ? MONGO_PROD_URI
-  : (isDevelopment() ? MONGO_DEV_URI : MONGO_TEST_URI)
+  : isDevelopment()
+  ? MONGO_DEV_URI
+  : MONGO_TEST_URI
 
-mongoose.connect(mongoURI, {
+mongoose
+  .connect(mongoURI, {
     useCreateIndex: true,
     useNewUrlParser: true,
-    useFindAndModify: false
+    useFindAndModify: false,
   })
   .then(() => console.log('DB connected'))
-  .catch((err) => console.error(err))
+  .catch(err => console.error(err))
